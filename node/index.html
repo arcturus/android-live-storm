@@ -1,0 +1,192 @@
+<html>
+<head>
+<link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://jquery-tagcloud.googlecode.com/svn/trunk/jquery.tagcloud.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script> 
+  var tags = {};
+  const MAX_TAG_COUNT = 5;
+  var socket = io.connect('http://localhost');
+  socket.on('tags', function (data) {
+    if (data == 'android') { return; }
+    if(data in tags) {
+	tags[data].count++;
+	if(tags[data].count > MAX_TAG_COUNT) {
+		tags[data].count = MAX_TAG_COUNT;
+	}
+	tags[data].time = new Date().getTime();
+    } else {
+	tags[data] = {'count': 1, 'tag': data, 'time': new Date().getTime()};
+    }
+    $("#lastTag").html("#" + data);
+  });
+  var links = [];
+  socket.on('links', function(data) {
+    var link = jQuery.parseJSON(data);
+    var extra = "";
+    if(typeof link.original != 'undefined') {
+      extra = '<br/><p><small>' + link.original + '</small></p>';
+    }
+    $('#links > tbody:last').prepend('<tr><td><h8><a href='+ link.link +' target="_blank">'+ link.link +'</a>'+ extra +'</h8></td></tr>');
+    links.push(link);
+  });
+  var apps = [];
+  socket.on('market', function(data) {
+    var app = jQuery.parseJSON(data);
+    var extra1 = "", extra2="";
+    if(app.ratingValue != "") {
+      var ratingParts = app.ratingValue.split(" ");
+      var rating = ratingParts[0] + " " + ratingParts[1];
+      extra1 = '<p><span class="label success">'+ rating +'</span></p>';
+    }
+    if(app.ratingCount != "") {
+      extra2 = '<p><span class="label success">'+ app.ratingCount +'</span></p>';
+    }
+    $('#apps > tbody:last').prepend('<tr><td><div><h3><a href="'+ app.url +'" target="_blank">'+ app.title +'</a></h3></div><div class="row"><div class="span4"><p><a href="'+ app.url +'" target="_blank"><img src="'+app.icon+'"/></p></a><br/>'+ extra1 +' ' + extra2 +'</div><div class="span16">'+app.description+'</div></div></td></tr>');
+    apps.push(app);
+  });
+  var tweets = {};
+  socket.on('retweets', function(data) {
+    var tweet = jQuery.parseJSON(data);
+    console.log(tweet);
+    if(typeof tweets[tweet.id] != 'undefined') {
+      if(tweets[tweet.id].count < tweet.count) {
+	tweets[tweet.id] = tweet;
+      } else {
+        return;
+      }
+    } else {
+      tweets[tweet.id] = tweet;
+    }	
+
+    $('#tweets > tbody:last').html('');
+    var tweetArray = [];
+    for(var i in tweets) {
+      tweetArray.push(tweets[i]);
+    }
+    tweetArray.sort(function(left, right) {
+      if(left.count < right.count) { 
+	return -1; i
+      } else if ( left.count == right.count) {
+        return 0;
+      } else {
+        return 1;
+      }
+    });
+    for(var j=0; j<tweetArray.length; j++) {
+      $('#tweets > tbody:last').prepend('<tr><td><div class="row"><div class="span3"><img src="'+ tweetArray[j].photo +'"/></div><div span="13"><blockquote><p>'+ replaceURLWithHTMLLinks(tweetArray[j].tweet) +'</p><small>'+ tweetArray[j].user +'</small></blockquote></div></div><div><p><small>Retweets:&nbsp;<span class="label success">'+ tweetArray[j].count +'</p></div></td></tr>');
+    }
+    $("#tweetsCount").html(tweetArray.length);
+  });
+
+function replaceURLWithHTMLLinks(text) {
+    var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+    return text.replace(exp,"<a href='$1' target='_blank'>$1</a>"); 
+}
+
+  $(document).ready(function() {update();});
+
+  var jqueryTags = [];
+  var tagCloudConfig = {'click': function(tag, event) { window.open('http://twitter.com/#!/search/android%20%23' + tag); }};
+  function update() { 
+    jqueryTags = [];
+    var now = new Date().getTime();
+    for(var i in tags) {
+	if(typeof tags[i].tag != 'undefined') {
+		if(tags[i].time + 60 * 1000 > now) {
+			jqueryTags.push(tags[i]);
+		} else { delete tags[i];}
+        }
+    }
+    
+    $("#tagcloud").tagCloud(jqueryTags, tagCloudConfig);
+    $("#linksCount").html(links.length);
+    $("#appsCount").html(apps.length);
+    setTimeout(update, 1000);     
+  }
+</script>
+</head>
+<body>
+	<div class="topbar"></div>
+	<div class="container">
+		<div class="hero-unit">
+			<h1>Welcome to Android Live!</h1>
+			<p>Android live brings you real information about what's happening in twitter related to your favourite mobile operating system.</p>
+			<p>Live tweets, hashtags, applications, links, anything related to android that is happening in Twitter, is here!</p>
+			<p><a class="btn primary large">Learn more</a></p>
+		</div>
+		<div class="row">
+			<div class="span6">
+				<h1>HashTags</h1>
+				<div style="position:relative">
+					<div id="tagcloud" class="well tagcloud" style="height: 200px;overflow:auto"></div>
+				</div>
+				<div>
+					<p><small>Last tag:&nbsp;<span class="label notice" id="lastTag">None yet</span></small></p>
+				</div>
+			</div>
+			<div class="span10">
+				<h1>Links</h1>
+				<div class="well" style="height: 200px;position:relative">
+					<div style="height: 190px;overflow:auto;">
+					<table id='links'>
+						<tbody>
+							<tr/>
+						</tbody>
+					</table>
+					</div>
+				</div>
+				<div>
+                                        <p><small>Links so far:&nbsp;<span class="label notice" id="linksCount">0</span></small></p>
+                                </div>
+			</div>
+		</div>
+		<div class="span16">
+            <h1>Relevant tweets</h1>
+            <div class="well" style="height:200px;position:relative">
+                <div style="height:180px;overflow:auto;">
+                <table id="tweets">
+                    <tbody>
+                        <tr/>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+            <div>
+                <p><small>Tweets:&nbsp;<span class="label notice" id="tweetsCount">0</p>
+            </div>
+        </div>
+		<div class="row">
+			<div class="span16">
+				<h1>Apps</h1>
+				<div class="well" style="height: 400px;position:relative">
+					<div style="height: 390px;overflow:auto;">
+						<table id="apps">
+							<tbody>
+								<tr/>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div>
+					<p><small>Apps so far:&nbsp;<span class="label notice" id="appsCount">0</span></small></p>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-28085399-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</html>
