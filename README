@@ -17,3 +17,8 @@ Using [Leiningen](https://github.com/technomancy/leiningen)
 lein deps & lein compile
 java -cp `lein classpath` storm.starter.TwitterTopology
 ```
+
+Run a redis and execute
+```
+node app.js
+```
