@@ -67,10 +67,10 @@ public class TwitterSampleSpout implements IRichSpout {
         TwitterStreamFactory fact = new TwitterStreamFactory(new ConfigurationBuilder().setUser(_username).setPassword(_pwd).build());
         _twitterStream = fact.getInstance();
         _twitterStream.addListener(listener);
+        //Magic filter
         FilterQuery filter = new FilterQuery();
         filter.track(new String[]{"android"});
         _twitterStream.filter(filter);
-        //_twitterStream.sample();
     }
 
     @Override

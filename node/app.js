@@ -13,6 +13,10 @@ app.get('/', function (req, res) {
   res.sendfile(__dirname + '/index.html');
 });
 
+app.get('/readme.html', function (req, res) {
+  res.sendfile(__dirname + '/readme.html');
+});
+
 io.sockets.on('connection', function (socket) {
   sub.on("message", function(pattern, key){
     socket.emit(pattern, key);
