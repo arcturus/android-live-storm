@@ -1,0 +1,5 @@
+This is an example of using Twitter Storm (http://engineering.twitter.com/2011/08/storm-is-coming-more-details-and-plans.html)
+and processing real live information comming from twitter continuosly.
+
+In this case this example use the Storm framework + redis and nodejs to show the user real time information about
+hashtags, links, relevant tweets and applications that are being tweeted and are related to the Android world.
