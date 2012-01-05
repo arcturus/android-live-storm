@@ -55,7 +55,7 @@ public class RedisLinksPublisherBolt extends RedisBolt {
 			msg.put("link", finalUrl.toString());
 			msg.put("host", finalUrl.getHost());
 			if(extra != null) {
-				msg.put("origianl", url.getURL().toString());
+				msg.put("original", url.getURL().toString());
 			}
 			
 			publish(msg.toJSONString());
