@@ -1,5 +1,6 @@
 # About this project
 
+
 This is an example of using Twitter Storm (http://engineering.twitter.com/2011/08/storm-is-coming-more-details-and-plans.html)
 and processing real live information comming from twitter continuosly.
 
@@ -12,13 +13,13 @@ Please look for more information into the projects mentionend above.
 
 # Compiling and running
 
-Using [Leiningen](https://github.com/technomancy/leiningen)
-```
+
+Using Leiningen (https://github.com/technomancy/leiningen):
+
 lein deps & lein compile
 java -cp `lein classpath` storm.starter.TwitterTopology
-```
 
-Run a redis and execute
-```
+
+Run a redis and execute:
+
 node app.js
-```

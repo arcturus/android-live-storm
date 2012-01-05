@@ -1,0 +1,31 @@
+<html>
+<head>
+<link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
+<body>
+    <div class="container">
+        <div class="span16">
+            <h1>Read me first</h1>
+            <dl>
+                <dt>What is this?</dt>
+                <dd>This is just a proof of concept to check how the <a href="https://github.com/nathanmarz/storm">Twitter Storm</a> technology works. This framework is meant to process streams of live information.
+                <dt>But really what is this about?</dt>
+                <dd>With twitter storm we will parse the twitter life stream, parsing it and showing relevant content related to the android world.</dd>
+            </dl>
+            <h1>What is the information that I can see on the web page?</h1>
+            <p>Once the information is processed using Storm, the information extracted is published using <a href="http://redis.io">redis</a> using it's pubsub capabilities. That means that the information is being push to your browser when it's processed, hopefully almost in real time. So, what you are watching is:</p>
+            <dl>
+                <dt>Hashtags:</dt>
+                <dd>Any tag coming from tweets related to android is published here. The tag cloud is being refreshed and tags stay for one minute if they are not refreshed. Also the prominent <i>android</i> hashtag has been removed from this tag cloud.</dd>
+                <dt>Links:</dt>
+                <dd>If a tweet contains a url, that url is printed here. Also the url will be expanded, and showed the original one in small case.</dd>
+                <dt>Relevant tweets:</dt>
+                <dd>Here will appear those tweets that are retweeted by certain number of people, also this list is order by number of retweets.</dd>
+                <dt>Apps:</dt>
+                <dd>Here you will see any android application which url in the marke is tweeted.</dd>
+            </dl>
+            <h1>Can I get the code for this?</h1>
+            <p>Definitely! For the backend and the fronted, just check: <a href="https://github.com/arcturus/android-live-storm">https://github.com/arcturus/android-live-storm</a></p>
+            <p><a class="btn primary large" href="/">Back</a></p>
+        </div>
+    </div>
+</body>
