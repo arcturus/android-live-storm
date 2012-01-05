@@ -61,7 +61,7 @@ public class RedisLinksPublisherBolt extends RedisBolt {
 			publish(msg.toJSONString());
 			
 			if("market.android.com".equals(finalUrl.getHost()) && finalUrl.getPath().contains("details")) {
-				marketUrls.add(msg);
+				marketUrls.add(msg.toJSONString());
 			}
 		}
 		
