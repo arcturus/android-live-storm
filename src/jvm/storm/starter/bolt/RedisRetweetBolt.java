@@ -33,6 +33,11 @@ public class RedisRetweetBolt extends RedisBolt {
 			return null;
 		}
 		
+		//Just tweets two days old
+		if(status.getCreatedAt().getTime() + 2*24*60*60*1000 < System.currentTimeMillis()) {
+			return null;
+		}
+		
 		JSONObject msg = new JSONObject();
 		Status originalStatus = status.getRetweetedStatus();
 		msg.put("user", originalStatus.getUser().getScreenName());

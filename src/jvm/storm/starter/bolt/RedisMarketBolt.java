@@ -3,6 +3,7 @@ package storm.starter.bolt;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.json.simple.JSONObject;
@@ -12,6 +13,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import storm.starter.bolt.RedisBolt.OnDynamicConfigurationListener;
+import storm.starter.utils.Utils;
 import twitter4j.Status;
 
 /**
@@ -23,12 +26,20 @@ import twitter4j.Status;
  * @author arcturus@ardeenelinfierno.com
  *
  */
-public class RedisMarketBolt extends RedisBolt {
+public class RedisMarketBolt extends RedisBolt implements OnDynamicConfigurationListener {
 	
 	public static final String CHANNEL = "market";
+	private final List<String> forbiddenUrls = new LinkedList<String>();
 
 	public RedisMarketBolt() {
 		super(CHANNEL);
+	}
+	
+	@Override
+	protected void setupNonSerializableAttributes() {
+		// TODO Auto-generated method stub
+		super.setupNonSerializableAttributes();
+		setupDynamicConfiguration(this);
 	}
 
 	@Override
@@ -36,6 +47,13 @@ public class RedisMarketBolt extends RedisBolt {
 		URL marketURL = getMarketUrl();
 		if(marketURL == null) {
 			return null;
+		}
+		
+		synchronized (forbiddenUrls) {
+			if(forbiddenUrls.contains(marketURL.toString())) {
+				log.debug("Forbidden app: " + marketURL.toString());
+				return null;
+			}
 		}
 		
 		
@@ -94,6 +112,11 @@ public class RedisMarketBolt extends RedisBolt {
 		} catch (MalformedURLException e) {
 			return null;
 		}
+	}
+
+	@Override
+	public void onConfigurationChange(String conf) {
+		Utils.StringToList(conf, forbiddenUrls);		
 	}
 
 }

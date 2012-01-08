@@ -3,11 +3,15 @@ package storm.starter.bolt;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.zookeeper.proto.SyncRequest;
 import org.json.simple.JSONObject;
 
+import storm.starter.bolt.RedisBolt.OnDynamicConfigurationListener;
+import storm.starter.utils.Utils;
 import twitter4j.Status;
 import twitter4j.URLEntity;
 
@@ -21,12 +25,20 @@ import twitter4j.URLEntity;
  * @author arcturus@ardeenelinfierno.com
  *
  */
-public class RedisLinksPublisherBolt extends RedisBolt {
+public class RedisLinksPublisherBolt extends RedisBolt implements OnDynamicConfigurationListener{
 	
 	public static final String CHANNEL = "links";
+	private final List<String> forbiddenDomains = new LinkedList<String>();
 
 	public RedisLinksPublisherBolt() {
 		super(CHANNEL);
+	}
+	
+	@Override
+	protected void setupNonSerializableAttributes() {
+		// TODO Auto-generated method stub
+		super.setupNonSerializableAttributes();
+		setupDynamicConfiguration(this);
 	}
 
 	@Override
@@ -75,6 +87,13 @@ public class RedisLinksPublisherBolt extends RedisBolt {
 			return null;
 		}
 		
+		synchronized (forbiddenDomains) {
+			if(forbiddenDomains.contains(url.getHost())) {
+				log.debug("Forbidden link: " + url.toString());
+				return null;
+			}
+		}
+		
 		if(url.toString().length() > 30) {
 			return url;
 		}
@@ -96,6 +115,10 @@ public class RedisLinksPublisherBolt extends RedisBolt {
 	
 	private URL getFinalUrl(URL url) {
 		return getFinalUrl(url, 5);
+	}
+	
+	public void onConfigurationChange(String conf) {
+		Utils.StringToList(conf, forbiddenDomains);
 	}
 	
 }

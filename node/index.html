@@ -9,7 +9,6 @@
 	  const MAX_TAG_COUNT = 5;
 	  var socket = io.connect('http://localhost');
 	  socket.on('tags', function (data) {
-	    if (data == 'android') { return; }
 	    if(data in tags) {
 		tags[data].count++;
 		if(tags[data].count > MAX_TAG_COUNT) {

@@ -3,7 +3,12 @@ package storm.starter.bolt;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.JedisPubSub;
 import twitter4j.Status;
 import twitter4j.json.DataObjectFactory;
 
@@ -23,20 +28,31 @@ import backtype.storm.tuple.Values;
  */
 public abstract class RedisBolt implements IRichBolt {
 	
-	protected Jedis jedis;
 	protected String channel;
+	protected String configChannel;
 	protected OutputCollector collector;
 	protected Tuple currentTuple;
+	protected Logger log;
+	protected JedisPool pool;
+	protected ConfigListenerThread configListenerThread;
+	
+	public interface OnDynamicConfigurationListener {
+		public void onConfigurationChange(String conf);
+	}
 	
 	public RedisBolt(String channel) {
 		this.channel = channel;
+		configChannel = "config_update_" + channel;
 	}
 
 	@Override
 	public void prepare(Map stormConf, TopologyContext context,
 			OutputCollector collector) {
-		jedis = new Jedis("localhost");
 		this.collector = collector;
+		
+		pool = new JedisPool(new JedisPoolConfig(), "localhost");
+		log = Logger.getLogger(getClass().getName());
+		setupNonSerializableAttributes();
 	}
 
 	@Override
@@ -58,8 +74,13 @@ public abstract class RedisBolt implements IRichBolt {
 
 	@Override
 	public void cleanup() {
-		// TODO Auto-generated method stub
-
+		if(pool != null) {
+			pool.destroy();
+		}
+		
+		if(configListenerThread != null) {
+			configListenerThread.end();
+		}
 	}
 
 	@Override
@@ -71,7 +92,94 @@ public abstract class RedisBolt implements IRichBolt {
 	public abstract List<Object> filter(Status status);
 	
 	public void publish(String msg) {
+		Jedis jedis = pool.getResource();
 		jedis.publish(channel, msg);
+		pool.returnResource(jedis);
 	}
-
+	
+	protected void setupNonSerializableAttributes() {
+		
+	}
+	
+	/**
+	 * Will create a new thread (carefull, if you specify a multiplicity of 3
+	 * for this bolt, you will create 3 new threads). That will listen to a 
+	 * redis pubsub channel, when ever a message is sent to that channel,
+	 * will read the key with the specific name in the message and pass it to the
+	 * onConfiguration function.
+	 */
+	protected void setupDynamicConfiguration(final OnDynamicConfigurationListener listener) {
+		configListenerThread = new ConfigListenerThread(listener);
+		configListenerThread.start();
+	}
+	
+	private class ConfigListenerThread extends Thread {
+		
+		//Use it's own pool, is in a different thread.
+		final Jedis jedis = new Jedis("localhost");
+		private OnDynamicConfigurationListener listener;
+		
+		public ConfigListenerThread(OnDynamicConfigurationListener l) {
+			listener = l;
+		}
+		
+		@Override
+		public void run() {
+			jedis.subscribe(new JedisPubSub() {
+				
+				@Override
+				public void onUnsubscribe(String arg0, int arg1) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void onSubscribe(String arg0, int arg1) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void onPUnsubscribe(String arg0, int arg1) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void onPSubscribe(String arg0, int arg1) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void onPMessage(String arg0, String arg1, String arg2) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void onMessage(String channel, String message) {
+					if(message == null) {
+						return;
+					}
+					
+					Jedis readConfigJedis = pool.getResource();
+					String config = readConfigJedis.get(message);
+					if(config == null) {
+						log.warn("Could not find any configuration with key " + message);
+						return;
+					}
+					pool.returnResource(readConfigJedis);
+					
+					listener.onConfigurationChange(config);
+				}
+			}, configChannel);
+		}
+		
+		public void end() {
+			if(jedis != null) {
+				jedis.quit();
+			}
+		}
+	}
 }
