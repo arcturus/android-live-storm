@@ -75,7 +75,7 @@ public class RedisLinksPublisherBolt extends RedisBolt {
 			return null;
 		}
 		
-		if(url.getHost().length() > 6) {
+		if(url.toString().length() > 30) {
 			return url;
 		}
 		
@@ -85,11 +85,7 @@ public class RedisLinksPublisherBolt extends RedisBolt {
 			String location = connection.getHeaderField("Location");
 			if(location != null && location.length() > 0) {
 				URL newURL = new URL(location);
-				if(newURL.getHost().length() <= 6 && deep > 0) {
-					return getFinalUrl(newURL, deep - 1);
-				} else {
-					return newURL;
-				}
+				return getFinalUrl(newURL, deep - 1);
 			}
 		} catch (IOException e) {
 			return url;
