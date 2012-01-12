@@ -87,6 +87,10 @@ public class RedisLinksPublisherBolt extends RedisBolt implements OnDynamicConfi
 			return null;
 		}
 		
+		if(deep <= 0) {
+			return url;
+		}
+		
 		synchronized (forbiddenDomains) {
 			if(forbiddenDomains.contains(url.getHost())) {
 				log.debug("Forbidden link: " + url.toString());
