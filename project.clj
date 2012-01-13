@@ -6,6 +6,7 @@
   :jvm-opts ["-Djava.library.path=/usr/local/lib:/opt/local/lib:/usr/lib"]
   :repositories {
                  "twitter4j" "http://twitter4j.org/maven2",
+		 "local" ~(str (.toURI (java.io.File. "maven_repository")))
                  }
 
   :dependencies [[org.clojure/clojure "1.2.0"]
@@ -16,6 +17,7 @@
 		 [log4j/log4j "1.2.16"]
 		 [redis.clients/jedis "2.0.0"]
                  [org.jsoup/jsoup "1.6.1"]
+		 [goose "2.1.10"]
                  ]
 
   :dev-dependencies [[storm "0.6.0"]
