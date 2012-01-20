@@ -41,7 +41,7 @@
     </repository>
     <repository>
       <id>local</id>
-      <url>file:/Users/arcturus/Documents/dev/git/arcturus/android-live-storm/maven_repository/</url>
+      <url>file:./maven_repository/</url>
     </repository>
   </repositories>
   <dependencies>

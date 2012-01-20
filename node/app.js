@@ -6,6 +6,7 @@ sub.subscribe("tags");
 sub.subscribe("links");
 sub.subscribe("market");
 sub.subscribe("retweets");
+sub.subscribe("articles");
 
 app.listen(8080);
 

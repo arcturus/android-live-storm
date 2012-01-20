@@ -1,6 +1,7 @@
 package storm.starter;
 
 import storm.starter.bolt.LinkFilterBolt;
+import storm.starter.bolt.RedisGooseExtractor;
 import storm.starter.bolt.RedisLinksPublisherBolt;
 import storm.starter.bolt.RedisMarketBolt;
 import storm.starter.bolt.RedisRetweetBolt;
@@ -22,7 +23,7 @@ public class TwitterTopology {
 				
 		//Tweets from twitter sport
 		//TODO: setup your twitter credentials
-		TwitterSampleSpout twitterSpout = new TwitterSampleSpout("user", "password");
+		TwitterSampleSpout twitterSpout = new TwitterSampleSpout("o2labstest", "o2labs");
 		builder.setSpout("twitter", twitterSpout);
 		
 		//Initial filter
@@ -38,6 +39,7 @@ public class TwitterTopology {
 		builder.setBolt("linkFilter", new LinkFilterBolt(), 2).shuffleGrouping("filter");
 		builder.setBolt("links", new RedisLinksPublisherBolt(), 4).shuffleGrouping("linkFilter");
 		builder.setBolt("market", new RedisMarketBolt(), 1).shuffleGrouping("links");
+		builder.setBolt("articles", new RedisGooseExtractor(), 5).shuffleGrouping("retweets");
 		
 		
 		Config conf = new Config();
