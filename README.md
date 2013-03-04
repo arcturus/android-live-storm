@@ -15,11 +15,11 @@ Please look for more information into the projects mentionend above.
 # Compiling and running
 Using Leiningen (https://github.com/technomancy/leiningen) :
 
-`lein deps`
-`lein compile`
-`java -cp <lein classpath> storm.starter.TwitterTopology`
+lein deps 
+lein compile
+java -cp `lein classpath` storm.starter.TwitterTopology
 
 
 Run a redis and execute:
 
-`node app.js`
+node app.js
