@@ -1,0 +1,14 @@
+{
+  "name": "android-live-storm-webserver",
+  "version": "0.0.1",
+  "author": "Francisco Jordano <francisco@jordano.es>",
+  "description": "a simple web server to serve the real time demo app",
+  "dependencies" : {
+    "express" :  "2.5",
+    "socket.io" : "*",
+    "redis" : "*"
+  },
+  "engines": {
+    "node": ">=0.6"
+  }
+}
