@@ -18,11 +18,12 @@ Using Leiningen (https://github.com/technomancy/leiningen) :
 ```
 lein deps
 lein compile
-java -cp <lein classpath> storm.starter.TwitterTopology
+java -cp `lein classpath` storm.starter.TwitterTopology
 ```
 
-Run a redis and execute:
+Run a local instance of redis and execute:
 
 ```
+npm install
 node app.js
 ```
