@@ -72,7 +72,7 @@ public class RedisLinksPublisherBolt extends RedisBolt implements OnDynamicConfi
 			
 			publish(msg.toJSONString());
 			
-			if("market.android.com".equals(finalUrl.getHost()) && finalUrl.getPath().contains("details")) {
+			if("play.google.com".equals(finalUrl.getHost()) && finalUrl.getPath().contains("details")) {
 				marketUrls.add(msg.toJSONString());
 			}
 		}

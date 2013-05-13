@@ -61,9 +61,9 @@ public class RedisMarketBolt extends RedisBolt implements OnDynamicConfiguration
 			Document doc = Jsoup.parse(marketURL, 10000);
 			String htmlTitle = doc.title();
 			String icon = doc.select("div.doc-banner-icon").first().select("img").first().attr("src");
-			String ratingValue = doc.select("div.ratings").first().attr("title");
-			Elements ratingElements = doc.select("td.doc-details-ratings-price").first().select("div[title]");
-			String ratingCount = ratingElements.size() >= 2 ? ratingElements.get(1).attr("title") : "";
+			String ratingValue = doc.select("div.ratings[itemprop=\"ratingValue\"]").attr("content");
+			//Elements ratingElements = doc.select("td.doc-details-ratings-price").first().select("div[title]");
+			//String ratingCount = ratingElements.size() >= 2 ? ratingElements.get(1).attr("title") : "";
 			String description = doc.select("div#doc-original-text").first().html();
 			String title = doc.select("h1.doc-banner-title").first().html();
 			
@@ -72,9 +72,12 @@ public class RedisMarketBolt extends RedisBolt implements OnDynamicConfiguration
 			json.put("title", title);
 			json.put("icon", icon);
 			json.put("ratingValue", ratingValue);
-			json.put("ratingCount", ratingCount);
+			//json.put("ratingCount", ratingCount);
+                        json.put("ratingCount", ratingValue);
+                        json.put("ratingCount", "N/A");
 			json.put("description", description);
 			json.put("url", marketURL.toString());
+                        
 			
 			publish(json.toJSONString());
 			
