@@ -5,4 +5,4 @@ lib/
 *.jar
 target
 .lein-deps-sum
-node/nodemodules
+node/node_modules
