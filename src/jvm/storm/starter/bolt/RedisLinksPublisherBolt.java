@@ -2,10 +2,13 @@ package storm.starter.bolt;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.zookeeper.proto.SyncRequest;
 import org.json.simple.JSONObject;
@@ -52,29 +55,34 @@ public class RedisLinksPublisherBolt extends RedisBolt implements OnDynamicConfi
 		URL finalUrl = null;
 		List<Object> marketUrls = new LinkedList<Object>();
 		for(URLEntity url: urls) {
-			finalUrl = getFinalUrl(url.getURL());
-			
-			if(finalUrl == null) {
-				continue;
-			}
-			
-			String extra = null;
-			if(!url.getURL().toString().equals(finalUrl.toString())) {
-				extra = ", \"original\": \"" + url.getURL().toString() + "\"";				
-			}
-			
-			JSONObject msg = new JSONObject();
-			msg.put("link", finalUrl.toString());
-			msg.put("host", finalUrl.getHost());
-			if(extra != null) {
-				msg.put("original", url.getURL().toString());
-			}
-			
-			publish(msg.toJSONString());
-			
-			if("play.google.com".equals(finalUrl.getHost()) && finalUrl.getPath().contains("details")) {
-				marketUrls.add(msg.toJSONString());
-			}
+                    try {
+                        //finalUrl = getFinalUrl(url.getURL());
+                    finalUrl = new URL(url.getExpandedURL());
+                        
+                        if(finalUrl == null) {
+                                continue;
+                        }
+                        
+                        String extra = null;
+                        if(!url.getURL().toString().equals(finalUrl.toString())) {
+                                extra = ", \"original\": \"" + url.getURL().toString() + "\"";				
+                        }
+                        
+                        JSONObject msg = new JSONObject();
+                        msg.put("link", finalUrl.toString());
+                        msg.put("host", finalUrl.getHost());
+                        if(extra != null) {
+                                msg.put("original", url.getURL().toString());
+                        }
+                        
+                        publish(msg.toJSONString());
+                        
+                        if("play.google.com".equals(finalUrl.getHost()) && finalUrl.getPath().contains("details")) {
+                                marketUrls.add(msg.toJSONString());
+                        }
+                    } catch (MalformedURLException ex) {
+                        Logger.getLogger(RedisLinksPublisherBolt.class.getName()).log(Level.SEVERE, null, ex);
+                    }
 		}
 		
 		

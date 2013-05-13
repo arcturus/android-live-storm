@@ -28,8 +28,12 @@ public class RedisRetweetBolt extends RedisBolt {
 	}
 
 	@Override
-	public List<Object> filter(Status status) {
-		if(status.getRetweetCount() < retweetCount) {
+	public List<Object> filter(Status original) {
+            Status status = original.getRetweetedStatus();
+            if (status == null) {
+                return null;
+            }
+                if(status.getRetweetCount() < retweetCount) {
 			return null;
 		}
 		
@@ -39,12 +43,12 @@ public class RedisRetweetBolt extends RedisBolt {
 		}
 		
 		JSONObject msg = new JSONObject();
-		Status originalStatus = status.getRetweetedStatus();
-		msg.put("user", originalStatus.getUser().getScreenName());
-		msg.put("photo", originalStatus.getUser().getProfileImageURL().toString());
-		msg.put("tweet", originalStatus.getText());
-		msg.put("id", originalStatus.getId());
-		msg.put("count", status.getRetweetCount() > 100 ? "> 100" : status.getRetweetCount());
+		msg.put("user", original.getUser().getScreenName());
+		msg.put("photo", original.getUser().getProfileImageURL().toString());
+		msg.put("tweet", original.getText());
+		msg.put("id", original.getId());
+		//msg.put("count", status.getRetweetCount() > 100 ? "> 100" : status.getRetweetCount());
+                msg.put("count", status.getRetweetCount());
 		
 		publish(msg.toJSONString());		
 		

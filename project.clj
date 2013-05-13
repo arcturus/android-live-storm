@@ -12,8 +12,8 @@
 
   :dependencies [[org.clojure/clojure "1.2.0"]
                  [org.clojure/clojure-contrib "1.2.0"]
-                 [org.twitter4j/twitter4j-core "2.2.5"]
-                 [org.twitter4j/twitter4j-stream "2.2.5"]
+                 [org.twitter4j/twitter4j-core "3.0.3"]
+                 [org.twitter4j/twitter4j-stream "3.0.3"]
 		 [storm/storm-kestrel "0.6.0"]
 		 [log4j/log4j "1.2.16"]
 		 [redis.clients/jedis "2.0.0"]

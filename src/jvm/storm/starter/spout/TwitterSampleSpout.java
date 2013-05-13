@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import twitter4j.FilterQuery;
+import twitter4j.StallWarning;
 import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
 import twitter4j.StatusListener;
@@ -61,6 +62,10 @@ public class TwitterSampleSpout implements IRichSpout {
 
             @Override
             public void onException(Exception e) {
+            }
+
+            public void onStallWarning(StallWarning sw) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
             
         };
