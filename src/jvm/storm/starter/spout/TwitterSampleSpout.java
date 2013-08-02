@@ -1,5 +1,6 @@
 package storm.starter.spout;
 
+import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 import twitter4j.TwitterStream;
 import twitter4j.TwitterStreamFactory;
@@ -69,7 +70,8 @@ public class TwitterSampleSpout implements IRichSpout {
             }
             
         };
-        TwitterStreamFactory fact = new TwitterStreamFactory(new ConfigurationBuilder().setUser(_username).setPassword(_pwd).build());
+
+        TwitterStreamFactory fact = new TwitterStreamFactory();
         _twitterStream = fact.getInstance();
         _twitterStream.addListener(listener);
         //Magic filter

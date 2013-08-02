@@ -18,7 +18,7 @@
 		 [log4j/log4j "1.2.16"]
 		 [redis.clients/jedis "2.0.0"]
                  [org.jsoup/jsoup "1.6.1"]
-		 [goose "2.1.10"]
+		 [com.gravity/goose "2.1.22"]
 		 [storm "0.6.0"]
                  ]
 

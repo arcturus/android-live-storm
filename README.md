@@ -10,20 +10,23 @@ This is just a 'Hello World' project following the storm-starter project (https:
 Please look for more information into the projects mentionend above.
 
 
-
-
 # Compiling and running
+
+Configure your Twitter account. Edit file src/twitter4j.properties and enter your Twitter oAuth credentials (https://dev.twitter.com/docs/auth/oauth/faq) 
+
 Using Leiningen (https://github.com/technomancy/leiningen) :
 
 ```
 lein deps
 lein compile
+mvn clean install
 java -cp `lein classpath` storm.starter.TwitterTopology
 ```
 
 Run a local instance of redis and execute:
 
 ```
+cd node
 npm install
 node app.js
 ```
