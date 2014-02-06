@@ -30,3 +30,7 @@ cd node
 npm install
 node app.js
 ```
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/arcturus/android-live-storm/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
